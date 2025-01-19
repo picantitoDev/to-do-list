@@ -136,6 +136,15 @@ const TodoController = function () {
         return projects;
     }
 
+    function findProject(name){
+        for (let project of projects) {
+            if(project.getName() === name)
+            {
+                return project;
+            }
+        }
+    }
+
     function deleteProject(name) {
         let index = null;
         for (let project of projects) {
@@ -150,6 +159,7 @@ const TodoController = function () {
     }
 
     return {
+        findProject,
         createProject,
         printProjects,
         getProjects,
@@ -165,9 +175,12 @@ const ScreenController = function () {
     let content = document.querySelector("#content");
 
     let createProjectButton = document.querySelector("#create-project-btn");
+    let createTaskButton = document.querySelector("#create-task-btn");
 
     //Projects
     let todoList = TodoController;
+    let currentProject = new Project("test", "test", "Test", "Test");
+    let i = 0, a= 0;
 
     let displayProjects = function () {
         clearSidebar();
@@ -188,25 +201,51 @@ const ScreenController = function () {
         });
     }
 
+    let clearContent = function(){
+        Array.from(content.children).forEach((child) => {
+            if (!child.id || child.id !== "create-task-btn") {
+                content.removeChild(child);
+            }
+        });
+    }
+
+    let displayTasks = function() {
+        clearContent();
+        for(let task of currentProject.getTasks()){
+            let div = document.createElement('div');
+            div.innerHTML = task.title;
+            content.appendChild(div);
+        }
+        console.log("PROBANDO")
+    }
 
 
     return {
-        displayTasks() {
-
-        },
-
         selectProject() {
             document.body.addEventListener('click', (event) => {
                 if (event.target.classList.contains('project')) {
                     console.log('Clicked on Project');
+                    currentProject = todoList.findProject(event.target.innerHTML);
+                    console.log(`Current Project Name: ${currentProject.getName()}`)
                 }
+                displayTasks();
             });
         },
 
-        createProject() {
+        createDOMProject() {
             createProjectButton.addEventListener("click", function () {
-                todoList.createProject("Proyecto Prueba");
+                todoList.createProject("Proyecto Prueba " + i);
                 displayProjects();
+                i++;
+            });
+        },
+
+        createDOMTask(){
+            createTaskButton.addEventListener("click", function () {
+                currentProject.createTask("Task Prueba "+a, "Desc", "Date", "High");
+                console.log(currentProject.readTasks());
+                displayTasks();
+                a++;
             });
         }
     }
@@ -214,8 +253,10 @@ const ScreenController = function () {
 }();
 
 let UI = ScreenController;
-UI.createProject();
+UI.createDOMProject();
+UI.createDOMTask();
 UI.selectProject();
+
 
 
 // let todoControl = new TodoController();
