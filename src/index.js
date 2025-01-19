@@ -81,13 +81,19 @@ class Project{
     
     readTasks(){
         for(let task of this.#tasks){
-            console.log(task);
+            console.log(JSON.stringify(task));
         }
     }
 
     // ?
-    updateTask(name){
-
+    updateTask(idx, newTitle, description, dueDate, priority){
+        let task = this.#tasks[idx];
+        task.title = newTitle;
+        task.description = description;
+        task.dueDate = dueDate;
+        task.priority = priority;
+        console.log("Task edited sucessfully")
+        return;
     }
 
     deleteTask(title){
@@ -97,12 +103,11 @@ class Project{
                 index = this.#tasks.indexOf(task);
             }
         }
-
         this.#tasks.splice(index, 1);
     }
 }
 
-class todoController{
+class TodoController{
     #projects = [];
 
    createProject(){
