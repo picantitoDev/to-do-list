@@ -10,8 +10,6 @@ class Task {
         this._priority = priority;
     }
 
-    // let task = new Task("Tarea Prueba", "descripcion", "date", "high")
-
     // Getter for title
     get title() {
         return this._title;
@@ -118,8 +116,7 @@ class Project {
 
 const TodoController = function () {
     let projects = [];
-    let currentProject;
-
+    
     function createProject(name) {
         let project = new Project(name);
         projects.push(project);
