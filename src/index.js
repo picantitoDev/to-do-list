@@ -1,5 +1,5 @@
-import { indexOf } from 'lodash';
-import './styles.css'; 
+import { forEach, indexOf } from 'lodash';
+import './styles.css';
 import { isTraversal } from 'css-what';
 
 class Task {
@@ -48,7 +48,7 @@ class Task {
     // Setter for dueDate
     set dueDate(newDueDate) {
 
-            this._dueDate = newDueDate;
+        this._dueDate = newDueDate;
 
     }
 
@@ -68,25 +68,34 @@ class Task {
 
 }
 
-class Project{
+class Project {
+    
     #tasks = [];
 
-    constructor(name){
+    constructor(name) {
         this.name = name;
     }
 
     createTask(title, description, dueDate, priority) {
         this.#tasks.push(new Task(title, description, dueDate, priority));
     }
-    
-    readTasks(){
-        for(let task of this.#tasks){
+
+    readTasks() {
+        for (let task of this.#tasks) {
             console.log(JSON.stringify(task));
         }
     }
 
+    getTasks(){
+        return this.#tasks;
+    }
+
+    getName() {
+        return this.name;
+    }
+
     // ?
-    updateTask(idx, newTitle, description, dueDate, priority){
+    updateTask(idx, newTitle, description, dueDate, priority) {
         let task = this.#tasks[idx];
         task.title = newTitle;
         task.description = description;
@@ -96,10 +105,10 @@ class Project{
         return;
     }
 
-    deleteTask(title){
+    deleteTask(title) {
         let index = null
-        for(let task of this.#tasks){
-            if(task.title === title){
+        for (let task of this.#tasks) {
+            if (task.title === title) {
                 index = this.#tasks.indexOf(task);
             }
         }
@@ -107,38 +116,117 @@ class Project{
     }
 }
 
-class TodoController{
-    #projects = [];
+const TodoController = function () {
+    let projects = [];
+    let currentProject;
 
-   createProject(){
+    function createProject(name) {
+        let project = new Project(name);
+        projects.push(project);
+        return project;
+    }
 
-   }
-   
-   readProjects(){
+    function printProjects() {
+        for (let project of projects) {
+            console.log(project);
+        }
+    }
 
-   }
+    function getProjects() {
+        return projects;
+    }
 
-   updateProject(name){
+    function deleteProject(name) {
+        let index = null;
+        for (let project of projects) {
+            if (project.name === name) {
+                index = projects.indexOf(project);
+                break; // Stop loop once the project is found
+            }
+        }
+        if (index !== null) {
+            projects.splice(index, 1);
+        }
+    }
 
-   }
+    return {
+        createProject,
+        printProjects,
+        getProjects,
+        deleteProject,
+    };
+}();
 
-   deleteProject(name){
+const ScreenController = function () {
 
-   }
-}
+    //DOM Objects
+    let sidebar = document.querySelector("#sidebar");
+    let header = document.querySelector("#header");
+    let content = document.querySelector("#content");
 
-class screenController{
+    let createProjectButton = document.querySelector("#create-project-btn");
 
-}
+    //Projects
+    let todoList = TodoController;
 
-let project = new Project("Proyecto Prueba")
+    let displayProjects = function () {
+        clearSidebar();
+        for (let project of todoList.getProjects()) {
+            let div = document.createElement('div');
+            div.innerHTML = `${project.getName()}`;
+            div.classList.add(...("project flex items-center p-4 text-xl h-[40px] cursor-pointer text-purple-950 font-semibold border-b-4 border-b-purple-300".split(' ')));
+            sidebar.appendChild(div);
+        }
+    };
 
-project.createTask("Tarea Prueba 1", "descripcion", "date", "high")
-project.createTask("Tarea Prueba 2", "descripcion", "date", "high")
-project.createTask("Tarea Prueba 3", "descripcion", "date", "high")
-project.createTask("Tarea Prueba 4", "descripcion", "date", "high")
 
-project.readTasks();
-console.log("Borrando prueba 3")
-project.deleteTask("Tarea Prueba 3")
-project.readTasks()
+    let clearSidebar = function () {
+        Array.from(sidebar.children).forEach((child) => {
+            if (!child.id || child.id !== "create-project-btn") {
+                sidebar.removeChild(child);
+            }
+        });
+    }
+
+
+
+    return {
+        displayTasks() {
+
+        },
+
+        selectProject() {
+            document.body.addEventListener('click', (event) => {
+                if (event.target.classList.contains('project')) {
+                    console.log('Clicked on Project');
+                }
+            });
+        },
+
+        createProject() {
+            createProjectButton.addEventListener("click", function () {
+                todoList.createProject("Proyecto Prueba");
+                displayProjects();
+            });
+        }
+    }
+
+}();
+
+let UI = ScreenController;
+UI.createProject();
+UI.selectProject();
+
+
+// let todoControl = new TodoController();
+// let project1 = todoControl.createProject("Proyecto 1");
+// let project2 = todoControl.createProject("Proyecto 2");
+// let project3 = todoControl.createProject("Proyecto 3");
+// let project4 = todoControl.createProject("Proyecto 4");
+// todoControl.printProjects();
+// project1.createTask("Task Prueba 1", "Description", "Date", "high")
+// project2.createTask("Task Prueba 2", "Description", "Date", "high")
+// project3.createTask("Task Prueba 3", "Description", "Date", "high")
+// project4.createTask("Task Prueba 4", "Description", "Date", "high")
+// project4.readTasks();
+// todoControl.printProjects();

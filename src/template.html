@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To Do List</title>
 </head>
-<body class="flex h-svh w-svw justify-center items-center bg-black">
-    <div class="h-[700px] w-[800px] bg-rose-100 grid sm:grid-cols-12">
-        <!-- <button class="relative left-[700px] h-[40px] w-[100px] bg-slate-300 p-2 rounded-xl">Create Task</button> -->
-        <div class="bg-red-600 col-span-12 h-[40px]"></div>
-        <div class="bg-green-400 col-span-3 h-[calc(700px-40px)]"></div>
-        <div class="bg-blue-300 col-span-9">aaaSSSSSSSSSS</div>
+<body class="flex h-svh w-svw justify-center items-center bg-[#faf5ff]">
+    <div class="h-[700px] w-[800px] grid sm:grid-cols-12">
+        <!-- Header -->
+        <div class="bg-[#7e22ce] col-span-12 h-[60px] text-white font-bold flex items-center pl-4 text-4xl" id="header">ToDo List</div>
+        
+        <!-- Sidebar -->
+        <div class="bg-[#e1daff] col-span-3 h-[calc(700px-40px)] overflow-y-auto" id="sidebar">
+            <button id="create-project-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create Project</button>
+        </div>
+        
+        <!-- Content -->
+        <div class="bg-white col-span-9" id="content"></div>
     </div>
 </body>
 </html>
