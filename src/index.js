@@ -1,4 +1,6 @@
+import { indexOf } from 'lodash';
 import './styles.css'; 
+import { isTraversal } from 'css-what';
 
 class Task {
     constructor(title, description, dueDate, priority) {
@@ -88,12 +90,15 @@ class Project{
 
     }
 
-    deleteTask(name){
+    deleteTask(title){
+        let index = null
         for(let task of this.#tasks){
-            if(task.getName() === name){
-                this.#tasks.remove(task);
+            if(task.title === title){
+                index = this.#tasks.indexOf(task);
             }
         }
+
+        this.#tasks.splice(index, 1);
     }
 }
 
@@ -129,3 +134,6 @@ project.createTask("Tarea Prueba 3", "descripcion", "date", "high")
 project.createTask("Tarea Prueba 4", "descripcion", "date", "high")
 
 project.readTasks();
+console.log("Borrando prueba 3")
+project.deleteTask("Tarea Prueba 3")
+project.readTasks()
