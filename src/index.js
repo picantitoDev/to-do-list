@@ -199,10 +199,6 @@ const ScreenController = function () {
     let currentProject = new Project("test", "test", "Test", "Test");
     let i = 0, a = 0;
 
-
-
-
-
     // Function to open the modal
     const openModal = function () {
         modal.classList.remove("hidden");
@@ -275,6 +271,11 @@ const ScreenController = function () {
             div.innerHTML = `${project.getName()}`;
             div.classList.add(...("project flex items-center p-4 text-xl h-[40px] cursor-pointer text-purple-950 font-semibold border-b-4 border-b-purple-300".split(' ')));
             sidebar.appendChild(div);
+            if(div.innerHTML === currentProject.getName()){
+                div.classList.add("bg-purple-500");
+            }else{
+                clearBackgroundProjects();
+            }
         }
     };
 
@@ -321,14 +322,39 @@ const ScreenController = function () {
         return value.textContent.trim();
     }
 
+    let clearBackgroundProjects = function(){
+        Array.from(sidebar.children).forEach((child) => {
+            if ((!child.id || child.id !== "create-project-btn") && child.innerHTML !== currentProject.getName()) {
+                child.classList.remove("bg-purple-500")
+            }
+        });
+    }
+
+    let openDescriptionModal = function(currentTask){
+        const descriptionModal = document.querySelector("#description-modal")
+        const param = document.querySelector("#set-description")
+        descriptionModal.classList.remove("hidden");
+        param.innerHTML = currentTask.description;
+    }
+
+    let closeDescriptionModal = function(){
+        const closeViewModal = document.querySelector("#close-view-modal");
+        closeViewModal.addEventListener("click", function(){
+            const descriptionModal = document.querySelector("#description-modal")
+            descriptionModal.classList.add("hidden");    
+        })
+    }
+
     return {
         selectProject() {
             document.body.addEventListener('click', (event) => {
                 if (event.target.classList.contains('project')) {
-                    console.log('Clicked on Project');
+                    console.log(event.target);
+                    event.target.classList.add('bg-purple-500')
                     currentProject = todoList.findProject(event.target.innerHTML);
                     console.log(`Current Project Name: ${currentProject.getName()}`)
                 }
+                clearBackgroundProjects();
                 displayTasks();
             });
         },
@@ -342,9 +368,9 @@ const ScreenController = function () {
 
                     openEditModal(currentTask);
                     sumbitEditModal(currentTask);
+                    editCloseModal.addEventListener('click', closeEditModal);
                 }
             });
-            editCloseModal.addEventListener('click', closeEditModal);
         },
 
         detailsClicked() {
@@ -352,7 +378,8 @@ const ScreenController = function () {
                 if (event.target.classList.contains('details-button')) {
                     console.log('Clicked on Details Button');
                     let currentTask = currentProject.findTask(getDOMTask(event));
-                    console.log(currentTask)
+                    openDescriptionModal(currentTask);
+                    closeDescriptionModal();
                 }
             });
         },
@@ -391,19 +418,3 @@ UI.createDOMTask();
 UI.editClicked();
 UI.detailsClicked();
 UI.deleteClicked();
-
-
-
-
-// let todoControl = new TodoController();
-// let project1 = todoControl.createProject("Proyecto 1");
-// let project2 = todoControl.createProject("Proyecto 2");
-// let project3 = todoControl.createProject("Proyecto 3");
-// let project4 = todoControl.createProject("Proyecto 4");
-// todoControl.printProjects();
-// project1.createTask("Task Prueba 1", "Description", "Date", "high")
-// project2.createTask("Task Prueba 2", "Description", "Date", "high")
-// project3.createTask("Task Prueba 3", "Description", "Date", "high")
-// project4.createTask("Task Prueba 4", "Description", "Date", "high")
-// project4.readTasks();
-// todoControl.printProjects();
