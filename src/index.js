@@ -252,9 +252,10 @@ const ScreenController = function () {
             div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8 border-l-green-500">
                 <div class="flex justify-evenly gap-2">
                     <input type="checkbox">
-                    <p>Pasear al perro</p>
+                    <p> ${task.title}</p>
                 </div>
                 <div class="flex gap-4">
+                    <p>${task.dueDate}</p>
                     <button>DETAILS</button>
                     <button>EDIT</button>
                     <button>DELETE</button>
