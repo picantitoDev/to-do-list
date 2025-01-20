@@ -1,24 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To Do List</title>
 </head>
+
 <body class="flex h-svh w-svw justify-center items-center bg-[#faf5ff] p-40">
-    <div class="h-[50rem] w-[100rem] grid sm:grid-cols-12">
+    <div class="h-[40rem] w-[80rem] grid sm:grid-cols-12">
         <!-- Header -->
-        <div class="bg-[#7e22ce] h-[4rem] col-span-12  text-white font-bold flex items-center pl-4 text-4xl" id="header">ToDo List</div>
-        
+        <div class="bg-[#7e22ce] h-[4rem] col-span-12  text-white font-bold flex items-center pl-4 text-4xl"
+            id="header">ToDo List</div>
+
         <!-- Sidebar -->
-        <div class="bg-[#e1daff] h-[46rem] col-span-3 overflow-y-auto" id="sidebar">
-            <button id="create-project-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create Project</button>
+        <div class="bg-[#e1daff] h-[36rem] col-span-3 overflow-y-auto" id="sidebar">
+            <button id="create-project-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create
+                Project</button>
         </div>
-        
+
         <!-- Content -->
-        <div class="bg-white col-span-9 h-[46rem]" id="content">
-            <button  id="create-task-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create Task</button>
+        <div class="bg-white col-span-9 h-[36rem] overflow-y-auto flex flex-col gap-4 p-0" id="content">
+            <button id="create-task-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create
+                Task</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="flex fixed inset-0 bg-gray-900 bg-opacity-50 justify-center items-center z-50">
+        <div class="bg-white rounded-lg p-6 w-96 relative">
+            <button id="close-modal" class="absolute top-2 right-2 text-gray-500 hover:text-black">&times;</button>
+            <h2 class="text-xl font-bold mb-4">Create a New Task</h2>
+            <form id="task-form" class="space-y-4">
+                <input type="text" id="title" class="border border-gray-300 rounded w-full p-2" placeholder="Task Title"
+                    required />
+                <textarea id="description" class="border border-gray-300 rounded w-full p-2"
+                    placeholder="Task Description" required></textarea>
+                <input type="date" id="dueDate" class="border border-gray-300 rounded w-full p-2" required />
+                <select id="priority" class="border border-gray-300 rounded w-full p-2" required>
+                    <option value="" disabled selected>Select Priority</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+                <button type="sumbit" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 w-full">
+                    Add Task
+                </button>
+            </form>
         </div>
     </div>
 </body>
+
 </html>

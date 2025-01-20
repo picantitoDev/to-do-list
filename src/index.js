@@ -67,7 +67,7 @@ class Task {
 }
 
 class Project {
-    
+
     #tasks = [];
 
     constructor(name) {
@@ -84,7 +84,7 @@ class Project {
         }
     }
 
-    getTasks(){
+    getTasks() {
         return this.#tasks;
     }
 
@@ -116,7 +116,7 @@ class Project {
 
 const TodoController = function () {
     let projects = [];
-    
+
     function createProject(name) {
         let project = new Project(name);
         projects.push(project);
@@ -133,10 +133,9 @@ const TodoController = function () {
         return projects;
     }
 
-    function findProject(name){
+    function findProject(name) {
         for (let project of projects) {
-            if(project.getName() === name)
-            {
+            if (project.getName() === name) {
                 return project;
             }
         }
@@ -174,10 +173,50 @@ const ScreenController = function () {
     let createProjectButton = document.querySelector("#create-project-btn");
     let createTaskButton = document.querySelector("#create-task-btn");
 
+    //Create task modal
+    // DOM Elements
+    const modal = document.getElementById('modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const taskForm = document.getElementById('task-form');
+
     //Projects
     let todoList = TodoController;
     let currentProject = new Project("test", "test", "Test", "Test");
-    let i = 0, a= 0;
+    let i = 0, a = 0;
+
+
+    // Function to open the modal
+    const openModal = function () {
+        modal.classList.remove("hidden");
+    };
+
+    // Function to close the modal
+    const closeModal = function () {
+        modal.classList.add("hidden");
+    };
+
+    const sumbitModal = function () {
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Get values from the form
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const dueDate = document.getElementById('dueDate').value;
+            const priority = document.getElementById('priority').value;
+
+            // Create a new Task object
+            // Add task to the list
+            currentProject.createTask(title, description, dueDate, priority)
+
+            // Clear the form and close the modal
+            taskForm.reset();
+            modal.classList.add('hidden');
+            displayTasks();
+        });
+    }
+
+
 
     let displayProjects = function () {
         clearSidebar();
@@ -198,7 +237,7 @@ const ScreenController = function () {
         });
     }
 
-    let clearContent = function(){
+    let clearContent = function () {
         Array.from(content.children).forEach((child) => {
             if (!child.id || child.id !== "create-task-btn") {
                 content.removeChild(child);
@@ -206,14 +245,23 @@ const ScreenController = function () {
         });
     }
 
-    let displayTasks = function() {
+    let displayTasks = function () {
         clearContent();
-        for(let task of currentProject.getTasks()){
+        for (let task of currentProject.getTasks()) {
             let div = document.createElement('div');
-            div.innerHTML = task.title;
+            div.innerHTML = `<div class="bg-gray-200 flex justify-between px-4 border-l-8 border-l-green-500">
+                <div class="flex justify-evenly gap-2">
+                    <input type="checkbox">
+                    <p>Pasear al perro</p>
+                </div>
+                <div class="flex gap-4">
+                    <button>DETAILS</button>
+                    <button>EDIT</button>
+                    <button>DELETE</button>
+                </div>
+            </div>`;
             content.appendChild(div);
         }
-        console.log("PROBANDO")
     }
 
 
@@ -226,6 +274,7 @@ const ScreenController = function () {
                     console.log(`Current Project Name: ${currentProject.getName()}`)
                 }
                 displayTasks();
+                console.log(currentProject.getTasks())
             });
         },
 
@@ -237,13 +286,10 @@ const ScreenController = function () {
             });
         },
 
-        createDOMTask(){
-            createTaskButton.addEventListener("click", function () {
-                currentProject.createTask("Task Prueba "+a, "Desc", "Date", "High");
-                console.log(currentProject.readTasks());
-                displayTasks();
-                a++;
-            });
+        createDOMTask() {
+            createTaskButton.addEventListener("click", openModal);
+            closeModalBtn.addEventListener("click", closeModal);
+            sumbitModal();
         }
     }
 
@@ -251,8 +297,9 @@ const ScreenController = function () {
 
 let UI = ScreenController;
 UI.createDOMProject();
-UI.createDOMTask();
 UI.selectProject();
+UI.createDOMTask();
+
 
 
 
