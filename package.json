@@ -45,6 +45,7 @@
     "css-select": "^4.3.0",
     "css-what": "^6.1.0",
     "cssesc": "^3.0.0",
+    "date-fns": "^4.1.0",
     "debug": "^2.6.9",
     "default-browser": "^5.2.1",
     "default-browser-id": "^5.0.0",
@@ -283,7 +284,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --mode=development --config webpack.config.js"  
+    "start": "webpack-dev-server --mode=development --config webpack.config.js"
   },
   "keywords": [],
   "author": "Piero Arturo",

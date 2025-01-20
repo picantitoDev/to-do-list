@@ -185,6 +185,9 @@ const ScreenController = function () {
     let i = 0, a = 0;
 
 
+
+
+
     // Function to open the modal
     const openModal = function () {
         modal.classList.remove("hidden");
@@ -249,22 +252,27 @@ const ScreenController = function () {
         clearContent();
         for (let task of currentProject.getTasks()) {
             let div = document.createElement('div');
-            div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8 border-l-green-500">
+            div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8 border-l-green-500 task-container">
                 <div class="flex justify-evenly gap-2">
                     <input type="checkbox">
-                    <p> ${task.title}</p>
+                    <p class="task-title"> ${task.title}</p>
                 </div>
                 <div class="flex gap-4">
                     <p>${task.dueDate}</p>
-                    <button>DETAILS</button>
-                    <button>EDIT</button>
-                    <button>DELETE</button>
+                    <button class="bg-yellow-400 details-button">DETAILS</button>
+                    <button class="bg-yellow-400 edit-button">EDIT</button>
+                    <button class="bg-yellow-400 delete-button">DELETE</button>
                 </div>
             </div>`;
             content.appendChild(div);
         }
     }
 
+    let getDOMTask = function (event) {
+        const taskElement = event.target.closest(".task-container");
+        let value = taskElement.querySelector('.task-title');
+        return value
+    }
 
     return {
         selectProject() {
@@ -275,7 +283,32 @@ const ScreenController = function () {
                     console.log(`Current Project Name: ${currentProject.getName()}`)
                 }
                 displayTasks();
-                console.log(currentProject.getTasks())
+            });
+        },
+
+        editClicked() {
+            document.body.addEventListener('click', (event) => {
+                if (event.target.classList.contains('edit-button')) {
+                    console.log('Clicked on Edit Button');
+                }
+            });
+        },
+
+        detailsClicked() {
+            document.body.addEventListener('click', (event) => {
+                if (event.target.classList.contains('details-button')) {
+                    console.log('Clicked on Details Button');
+                }
+            });
+        },
+
+        deleteClicked() {
+            document.body.addEventListener('click', (event) => {
+                if (event.target.classList.contains('delete-button')) {
+                    console.log('Clicked on Delete Button');
+                    currentProject.deleteTask(getDOMTask(event));
+                    displayTasks();
+                }
             });
         },
 
@@ -300,6 +333,9 @@ let UI = ScreenController;
 UI.createDOMProject();
 UI.selectProject();
 UI.createDOMTask();
+UI.editClicked();
+UI.detailsClicked();
+UI.deleteClicked();
 
 
 
