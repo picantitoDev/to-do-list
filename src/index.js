@@ -249,7 +249,7 @@ const ScreenController = function () {
         clearContent();
         for (let task of currentProject.getTasks()) {
             let div = document.createElement('div');
-            div.innerHTML = `<div class="bg-gray-200 flex justify-between px-4 border-l-8 border-l-green-500">
+            div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8 border-l-green-500">
                 <div class="flex justify-evenly gap-2">
                     <input type="checkbox">
                     <p>Pasear al perro</p>

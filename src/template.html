@@ -23,11 +23,24 @@
         <div class="bg-white col-span-9 h-[36rem] overflow-y-auto flex flex-col gap-4 p-0" id="content">
             <button id="create-task-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create
                 Task</button>
-        </div>
+            
+               <div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8 border-l-green-500">
+                    <div class="flex justify-evenly gap-2">
+                        <input type="checkbox">
+                        <p>Pasear al perro</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <p>Dec 11th</p>
+                        <button>DETAILS</button>
+                        <button>EDIT</button>
+                        <button>DELETE</button>
+                    </div>
+                </div>
+        </div>  
     </div>
 
     <!-- Modal -->
-    <div id="modal" class="flex fixed inset-0 bg-gray-900 bg-opacity-50 justify-center items-center z-50">
+    <div id="modal" class="hidden flex fixed inset-0 bg-gray-900 bg-opacity-50 justify-center items-center z-50">
         <div class="bg-white rounded-lg p-6 w-96 relative">
             <button id="close-modal" class="absolute top-2 right-2 text-gray-500 hover:text-black">&times;</button>
             <h2 class="text-xl font-bold mb-4">Create a New Task</h2>
