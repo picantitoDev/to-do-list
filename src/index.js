@@ -93,14 +93,24 @@ class Project {
     }
 
     // ?
-    updateTask(idx, newTitle, description, dueDate, priority) {
-        let task = this.#tasks[idx];
-        task.title = newTitle;
-        task.description = description;
-        task.dueDate = dueDate;
-        task.priority = priority;
-        console.log("Task edited sucessfully")
-        return;
+    updateTask(newTitle, description, dueDate, priority) {
+        for (let task of this.#tasks) {
+            if (task.title = newTitle) {
+                task.description = description;
+                task.dueDate = dueDate;
+                task.priority = priority;
+                console.log("Task edited sucessfully")
+                return;
+            }
+        }
+    }
+
+    findTask(title) {
+        for (let task of this.#tasks) {
+            if (task.title === title) {
+                return task;
+            }
+        }
     }
 
     deleteTask(title) {
@@ -176,8 +186,13 @@ const ScreenController = function () {
     //Create task modal
     // DOM Elements
     const modal = document.getElementById('modal');
+    const editModal = document.getElementById('edit-modal');
+    const editCloseModal = document.getElementById('close-edit-modal')
     const closeModalBtn = document.getElementById('close-modal');
     const taskForm = document.getElementById('task-form');
+
+    //Edit task modal
+
 
     //Projects
     let todoList = TodoController;
@@ -219,6 +234,38 @@ const ScreenController = function () {
         });
     }
 
+    const openEditModal = function (task) {
+        const editModal = document.getElementById('edit-modal');
+        document.getElementById('edit-title').value = task.title;
+        document.getElementById('edit-description').value = task.description;
+        document.getElementById('edit-dueDate').value = task.dueDate;
+        document.getElementById('edit-priority').value = task.priority;
+        editModal.classList.remove('hidden');
+    };
+
+    const closeEditModal = function () {
+        const editModal = document.getElementById('edit-modal');
+        editModal.classList.add('hidden');
+    };
+
+    const sumbitEditModal = function (currentTask) {
+        // Attach the submit event handler (ensure only one listener is active)
+        const editForm = document.getElementById('edit-task-form');
+        editForm.onsubmit = (e) => {
+            e.preventDefault();
+
+            // Update task with new values
+            currentTask.title = document.getElementById('edit-title').value;
+            currentTask.description = document.getElementById('edit-description').value;
+            currentTask.dueDate = document.getElementById('edit-dueDate').value;
+            currentTask.priority = document.getElementById('edit-priority').value;
+
+            // Close modal, clear form, and refresh the task list
+            closeEditModal();
+            editForm.reset();
+            displayTasks();
+        };
+    }
 
 
     let displayProjects = function () {
@@ -271,7 +318,7 @@ const ScreenController = function () {
     let getDOMTask = function (event) {
         const taskElement = event.target.closest(".task-container");
         let value = taskElement.querySelector('.task-title');
-        return value
+        return value.textContent.trim();
     }
 
     return {
@@ -290,14 +337,22 @@ const ScreenController = function () {
             document.body.addEventListener('click', (event) => {
                 if (event.target.classList.contains('edit-button')) {
                     console.log('Clicked on Edit Button');
+                    const taskElement = getDOMTask(event);
+                    const currentTask = currentProject.findTask(taskElement);
+
+                    openEditModal(currentTask);
+                    sumbitEditModal(currentTask);
                 }
             });
+            editCloseModal.addEventListener('click', closeEditModal);
         },
 
         detailsClicked() {
             document.body.addEventListener('click', (event) => {
                 if (event.target.classList.contains('details-button')) {
                     console.log('Clicked on Details Button');
+                    let currentTask = currentProject.findTask(getDOMTask(event));
+                    console.log(currentTask)
                 }
             });
         },
