@@ -23,19 +23,6 @@
         <div class="bg-white col-span-9 h-[36rem] overflow-y-auto flex flex-col gap-4 p-0" id="content">
             <button id="create-task-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create
                 Task</button>
-            
-               <div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8 border-l-green-500">
-                    <div class="flex justify-evenly gap-2">
-                        <input type="checkbox">
-                        <p>Pasear al perro</p>
-                    </div>
-                    <div class="flex gap-4">
-                        <p>Dec 11th</p>
-                        <button>DETAILS</button>
-                        <button>EDIT</button>
-                        <button>DELETE</button>
-                    </div>
-                </div>
         </div>  
     </div>
 
@@ -94,6 +81,19 @@
             <p id="view-description" class="text-gray-700">
                 <p id="set-description"></p>
             </p>
+        </div>
+    </div>
+
+    <div id="create-project-modal" class="hidden flex fixed inset-0 bg-gray-900 bg-opacity-50 justify-center items-center z-50">
+        <div class="bg-white rounded-lg p-6 w-96 relative">
+            <button id="close-create-project-modal" class="absolute top-2 right-2 text-gray-500 hover:text-black">&times;</button>
+            <h2 class="text-xl font-bold mb-4">Create New Project</h2>
+            <form id="create-project-form" class="space-y-4">
+                <input type="text" id="project-name" class="border border-gray-300 rounded w-full p-2" placeholder="Project Name" required />
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full">
+                    Save Project
+                </button>
+            </form>
         </div>
     </div>
     

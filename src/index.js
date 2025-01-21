@@ -139,6 +139,10 @@ const TodoController = function () {
         }
     }
 
+    function addProject(project) {
+        projects.push(project);
+    }
+
     function getProjects() {
         return projects;
     }
@@ -166,6 +170,7 @@ const TodoController = function () {
 
     return {
         findProject,
+        addProject,
         createProject,
         printProjects,
         getProjects,
@@ -196,7 +201,8 @@ const ScreenController = function () {
 
     //Projects
     let todoList = TodoController;
-    let currentProject = new Project("test", "test", "Test", "Test");
+    let currentProject = new Project("Default");
+
     let i = 0, a = 0;
 
     // Function to open the modal
@@ -271,9 +277,9 @@ const ScreenController = function () {
             div.innerHTML = `${project.getName()}`;
             div.classList.add(...("project flex items-center p-4 text-xl h-[40px] cursor-pointer text-purple-950 font-semibold border-b-4 border-b-purple-300".split(' ')));
             sidebar.appendChild(div);
-            if(div.innerHTML === currentProject.getName()){
+            if (div.innerHTML === currentProject.getName()) {
                 div.classList.add("bg-purple-500");
-            }else{
+            } else {
                 clearBackgroundProjects();
             }
         }
@@ -322,7 +328,7 @@ const ScreenController = function () {
         return value.textContent.trim();
     }
 
-    let clearBackgroundProjects = function(){
+    let clearBackgroundProjects = function () {
         Array.from(sidebar.children).forEach((child) => {
             if ((!child.id || child.id !== "create-project-btn") && child.innerHTML !== currentProject.getName()) {
                 child.classList.remove("bg-purple-500")
@@ -330,22 +336,70 @@ const ScreenController = function () {
         });
     }
 
-    let openDescriptionModal = function(currentTask){
+    let openDescriptionModal = function (currentTask) {
         const descriptionModal = document.querySelector("#description-modal")
         const param = document.querySelector("#set-description")
         descriptionModal.classList.remove("hidden");
         param.innerHTML = currentTask.description;
     }
 
-    let closeDescriptionModal = function(){
+    let closeDescriptionModal = function () {
         const closeViewModal = document.querySelector("#close-view-modal");
-        closeViewModal.addEventListener("click", function(){
+        closeViewModal.addEventListener("click", function () {
             const descriptionModal = document.querySelector("#description-modal")
-            descriptionModal.classList.add("hidden");    
+            descriptionModal.classList.add("hidden");
         })
     }
 
+    let openProjectModal = function () {
+        const projectModal = document.querySelector("#create-project-modal")
+        projectModal.classList.remove("hidden");
+    }
+
+    let closeProjectModal = function () {
+        const closeProjectModal = document.querySelector("#close-create-project-modal");
+        closeProjectModal.addEventListener("click", function () {
+            const projectModal = document.querySelector("#create-project-modal")
+            projectModal.classList.add("hidden");
+        })
+    }
+
+    const saveProjectModal = function () {
+        const projectForm = document.getElementById('create-project-form');
+        const projectModal = document.querySelector("#create-project-modal")
+
+        projectForm.onsubmit = (e) => {
+            e.preventDefault();
+
+            // Update task with new values
+            todoList.createProject(document.querySelector("#project-name").value);
+
+            // Close modal, clear form, and refresh the task list
+            projectModal.classList.add("hidden");
+            projectForm.reset();
+            displayTasks();
+            displayProjects();
+        };
+    }
+
     return {
+        init() {
+            document.addEventListener("DOMContentLoaded", () => { // Trigger when the page loads
+                // Add a project to the todo list
+                todoList.addProject(currentProject);
+        
+                // Create day-to-day tasks for the current project
+                currentProject.createTask("Grocery Shopping", "Buy groceries for the week, including vegetables, fruits, snacks, and drinks.", "2025-01-21", "High");
+                currentProject.createTask("Laundry", "Wash, dry, and fold the laundry, including clothes and bed sheets.", "2025-01-22", "Medium");
+                currentProject.createTask("Clean the Kitchen", "Wipe countertops, clean the dishes, and organize the pantry.", "2025-01-23", "High");
+                currentProject.createTask("Prepare Dinner", "Cook a healthy dinner for the family, including a side dish and dessert.", "2025-01-21", "Medium");
+                currentProject.createTask("Take Out the Trash", "Collect all trash and take it to the bins outside.", "2025-01-22", "Low");
+             
+                // Display the projects and tasks on the page
+                displayProjects();
+                displayTasks();
+            });
+        },
         selectProject() {
             document.body.addEventListener('click', (event) => {
                 if (event.target.classList.contains('project')) {
@@ -396,9 +450,9 @@ const ScreenController = function () {
 
         createDOMProject() {
             createProjectButton.addEventListener("click", function () {
-                todoList.createProject("Proyecto Prueba " + i);
-                displayProjects();
-                i++;
+                openProjectModal();
+                closeProjectModal();
+                saveProjectModal();
             });
         },
 
@@ -412,6 +466,7 @@ const ScreenController = function () {
 }();
 
 let UI = ScreenController;
+UI.init();
 UI.createDOMProject();
 UI.selectProject();
 UI.createDOMTask();
