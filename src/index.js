@@ -325,6 +325,12 @@ const ScreenController = function () {
                 let div = document.createElement('div');
                 div.innerHTML = savedProject.getName();
                 div.classList.add(...("project flex items-center p-4 text-xl h-[40px] cursor-pointer text-purple-950 font-semibold border-b-4 border-b-purple-300".split(' ')));
+                
+                if (div.innerHTML === currentProject.getName()) {
+                    div.classList.add("bg-purple-500");
+                } else {
+                    clearBackgroundProjects();
+                }
                 sidebar.appendChild(div);
             }
         }
@@ -490,6 +496,7 @@ const ScreenController = function () {
                 }
 
                 // Display projects and tasks
+                
                 displayProjects();
                 displayTasks();
             });
