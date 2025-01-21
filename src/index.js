@@ -1,6 +1,4 @@
-import { forEach, indexOf } from 'lodash';
 import './styles.css';
-import { isTraversal } from 'css-what';
 
 class Task {
     constructor(title, description, dueDate, priority) {
@@ -78,6 +76,10 @@ class Project {
         this.#tasks.push(new Task(title, description, dueDate, priority));
     }
 
+    addTask(task) {
+        this.#tasks.push(task);
+    }
+
     readTasks() {
         for (let task of this.#tasks) {
             console.log(JSON.stringify(task));
@@ -85,7 +87,15 @@ class Project {
     }
 
     getTasks() {
-        return this.#tasks;
+        return [...this.#tasks];
+    }
+
+    set tasks(tasks) {
+        if (Array.isArray(tasks) && tasks.every(task => task instanceof Task)) {
+            this.#tasks = tasks;
+        } else {
+            console.error("Invalid tasks array");
+        }
     }
 
     getName() {
@@ -95,7 +105,7 @@ class Project {
     // ?
     updateTask(newTitle, description, dueDate, priority) {
         for (let task of this.#tasks) {
-            if (task.title = newTitle) {
+            if (task.title === newTitle) {
                 task.description = description;
                 task.dueDate = dueDate;
                 task.priority = priority;
@@ -122,6 +132,33 @@ class Project {
         }
         this.#tasks.splice(index, 1);
     }
+
+    toJSON() {
+        return {
+            name: this.name,
+            tasks: this.#tasks.map(task => ({
+                title: task.title,
+                description: task.description,
+                dueDate: task.dueDate,
+                priority: task.priority
+            }))
+        };
+    }
+
+    static fromJSON(data) {
+        const project = new Project(data.name);
+
+        // Safely handle cases where tasks might be undefined or not an array
+        if (Array.isArray(data.tasks)) {
+            data.tasks.forEach(taskData => {
+                project.addTask(new Task(taskData.title, taskData.description, taskData.dueDate, taskData.priority));
+            });
+        } else {
+            console.warn("No tasks found in the project data or invalid tasks structure.");
+        }
+
+        return project;
+    }
 }
 
 const TodoController = function () {
@@ -141,6 +178,10 @@ const TodoController = function () {
 
     function addProject(project) {
         projects.push(project);
+    }
+
+    function clearProjects(){
+        projects = [];
     }
 
     function getProjects() {
@@ -169,6 +210,7 @@ const TodoController = function () {
     }
 
     return {
+        clearProjects,
         findProject,
         addProject,
         createProject,
@@ -201,9 +243,8 @@ const ScreenController = function () {
 
     //Projects
     let todoList = TodoController;
-    let currentProject = new Project("Default");
+    let currentProject = null;
 
-    let i = 0, a = 0;
 
     // Function to open the modal
     const openModal = function () {
@@ -228,7 +269,7 @@ const ScreenController = function () {
             // Create a new Task object
             // Add task to the list
             currentProject.createTask(title, description, dueDate, priority)
-
+            updateProjectInLocalStorage(currentProject);
             // Clear the form and close the modal
             taskForm.reset();
             modal.classList.add('hidden');
@@ -263,6 +304,7 @@ const ScreenController = function () {
             currentTask.priority = document.getElementById('edit-priority').value;
 
             // Close modal, clear form, and refresh the task list
+            updateProjectInLocalStorage(currentProject);
             closeEditModal();
             editForm.reset();
             displayTasks();
@@ -272,18 +314,22 @@ const ScreenController = function () {
 
     let displayProjects = function () {
         clearSidebar();
-        for (let project of todoList.getProjects()) {
-            let div = document.createElement('div');
-            div.innerHTML = `${project.getName()}`;
-            div.classList.add(...("project flex items-center p-4 text-xl h-[40px] cursor-pointer text-purple-950 font-semibold border-b-4 border-b-purple-300".split(' ')));
-            sidebar.appendChild(div);
-            if (div.innerHTML === currentProject.getName()) {
-                div.classList.add("bg-purple-500");
-            } else {
-                clearBackgroundProjects();
+        let projectCount = parseInt(localStorage.getItem('projectCount')) || 1;
+
+        for (let i = 1; i < projectCount; i++) {
+            let savedProjectData = localStorage.getItem(`project_${i}`);
+
+            if (savedProjectData) {
+                let savedProject = Project.fromJSON(JSON.parse(savedProjectData));
+
+                let div = document.createElement('div');
+                div.innerHTML = savedProject.getName();
+                div.classList.add(...("project flex items-center p-4 text-xl h-[40px] cursor-pointer text-purple-950 font-semibold border-b-4 border-b-purple-300".split(' ')));
+                sidebar.appendChild(div);
             }
         }
     };
+
 
 
     let clearSidebar = function () {
@@ -372,7 +418,9 @@ const ScreenController = function () {
             e.preventDefault();
 
             // Update task with new values
-            todoList.createProject(document.querySelector("#project-name").value);
+            let newProject = new Project(document.querySelector("#project-name").value);
+            todoList.addProject(newProject);
+            saveToLocalStorage(newProject);
 
             // Close modal, clear form, and refresh the task list
             projectModal.classList.add("hidden");
@@ -382,20 +430,66 @@ const ScreenController = function () {
         };
     }
 
+
+    let saveToLocalStorage = function (project) {
+        // Retrieve the current counter or initialize it to 1
+        let c = parseInt(localStorage.getItem('projectCount')) || 1;
+
+        // Save the project with a unique key
+        localStorage.setItem(`project_${c}`, JSON.stringify(project.toJSON()));
+
+        // Increment the counter and save it back to Local Storage
+        localStorage.setItem('projectCount', c + 1);
+    }
+
+    let updateProjectInLocalStorage = function (project) {
+        let projectCount = parseInt(localStorage.getItem('projectCount')) || 1;
+
+        for (let i = 1; i < projectCount; i++) {
+            let savedProjectData = localStorage.getItem(`project_${i}`);
+
+            if (savedProjectData) {
+                // Rebuild the Project object using `fromJSON`
+                let savedProject = Project.fromJSON(JSON.parse(savedProjectData));
+
+                // Check if the project matches by name
+                if (savedProject.getName() === project.getName()) {
+                    // Update the tasks and save back
+                    savedProject.tasks = project.getTasks(); // Update tasks
+                    localStorage.setItem(`project_${i}`, JSON.stringify(savedProject.toJSON()));
+                    break;
+                }
+            }
+        }
+    };
+
+
     return {
         init() {
             document.addEventListener("DOMContentLoaded", () => { // Trigger when the page loads
-                // Add a project to the todo list
-                todoList.addProject(currentProject);
-        
-                // Create day-to-day tasks for the current project
-                currentProject.createTask("Grocery Shopping", "Buy groceries for the week, including vegetables, fruits, snacks, and drinks.", "2025-01-21", "High");
-                currentProject.createTask("Laundry", "Wash, dry, and fold the laundry, including clothes and bed sheets.", "2025-01-22", "Medium");
-                currentProject.createTask("Clean the Kitchen", "Wipe countertops, clean the dishes, and organize the pantry.", "2025-01-23", "High");
-                currentProject.createTask("Prepare Dinner", "Cook a healthy dinner for the family, including a side dish and dessert.", "2025-01-21", "Medium");
-                currentProject.createTask("Take Out the Trash", "Collect all trash and take it to the bins outside.", "2025-01-22", "Low");
-             
-                // Display the projects and tasks on the page
+                todoList.clearProjects();
+
+                // Retrieve all projects from localStorage
+                let projectCount = parseInt(localStorage.getItem('projectCount')) || 0;
+
+                for (let i = 1; i <= projectCount; i++) {
+                    let projectData = localStorage.getItem(`project_${i}`);
+                    if (projectData) {
+                        let project = Project.fromJSON(JSON.parse(projectData));
+                        todoList.addProject(project);
+                    }
+                }
+
+                if (todoList.getProjects().length > 0) {
+                    currentProject = todoList.getProjects()[0];
+                } else {
+                    currentProject = new Project("Default");
+                    todoList.addProject(currentProject);
+                    localStorage.setItem('project_1', JSON.stringify(currentProject.toJSON()));
+                    localStorage.setItem('projectCount', 1);
+                }
+
+                // Display projects and tasks
                 displayProjects();
                 displayTasks();
             });
@@ -443,6 +537,7 @@ const ScreenController = function () {
                 if (event.target.classList.contains('delete-button')) {
                     console.log('Clicked on Delete Button');
                     currentProject.deleteTask(getDOMTask(event));
+                    updateProjectInLocalStorage(currentProject);
                     displayTasks();
                 }
             });
