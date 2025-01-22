@@ -1,3 +1,4 @@
+import { update } from 'lodash';
 import './styles.css';
 
 class Task {
@@ -180,7 +181,7 @@ const TodoController = function () {
         projects.push(project);
     }
 
-    function clearProjects(){
+    function clearProjects() {
         projects = [];
     }
 
@@ -311,33 +312,6 @@ const ScreenController = function () {
         };
     }
 
-
-    let displayProjects = function () {
-        clearSidebar();
-        let projectCount = parseInt(localStorage.getItem('projectCount')) || 1;
-
-        for (let i = 1; i < projectCount; i++) {
-            let savedProjectData = localStorage.getItem(`project_${i}`);
-
-            if (savedProjectData) {
-                let savedProject = Project.fromJSON(JSON.parse(savedProjectData));
-
-                let div = document.createElement('div');
-                div.innerHTML = savedProject.getName();
-                div.classList.add(...("project flex items-center p-4 text-xl h-[40px] cursor-pointer text-purple-950 font-semibold border-b-4 border-b-purple-300".split(' ')));
-                
-                if (div.innerHTML === currentProject.getName()) {
-                    div.classList.add("bg-purple-500");
-                } else {
-                    clearBackgroundProjects();
-                }
-                sidebar.appendChild(div);
-            }
-        }
-    };
-
-
-
     let clearSidebar = function () {
         Array.from(sidebar.children).forEach((child) => {
             if (!child.id || child.id !== "create-project-btn") {
@@ -437,141 +411,195 @@ const ScreenController = function () {
     }
 
 
-    let saveToLocalStorage = function (project) {
-        // Retrieve the current counter or initialize it to 1
-        let c = parseInt(localStorage.getItem('projectCount')) || 1;
+    let displayProjects = function () {
+        clearSidebar(); // Clear existing sidebar items
 
-        // Save the project with a unique key
-        localStorage.setItem(`project_${c}`, JSON.stringify(project.toJSON()));
+        // Retrieve the number of projects from localStorage
+        let projectCount = parseInt(localStorage.getItem('projectCount')) || 0;
 
-        // Increment the counter and save it back to Local Storage
-        localStorage.setItem('projectCount', c + 1);
-    }
-
-    let updateProjectInLocalStorage = function (project) {
-        let projectCount = parseInt(localStorage.getItem('projectCount')) || 1;
-
-        for (let i = 1; i < projectCount; i++) {
+        for (let i = 0; i < projectCount; i++) {
             let savedProjectData = localStorage.getItem(`project_${i}`);
 
             if (savedProjectData) {
-                // Rebuild the Project object using `fromJSON`
+                // Rebuild the Project object
                 let savedProject = Project.fromJSON(JSON.parse(savedProjectData));
 
-                // Check if the project matches by name
+                // Create a new div for the project
+                let div = document.createElement('div');
+                div.innerHTML = savedProject.getName();
+                div.classList.add(
+                    "project",
+                    "flex",
+                    "items-center",
+                    "p-4",
+                    "text-xl",
+                    "h-[40px]",
+                    "cursor-pointer",
+                    "text-purple-950",
+                    "font-semibold",
+                    "border-b-4",
+                    "border-b-purple-300"
+                );
+
+                // Highlight the current project
+                if (savedProject.getName() === currentProject.getName()) {
+                    div.classList.add("bg-purple-500");
+                }
+
+                // Append to sidebar
+                sidebar.appendChild(div);
+            }
+        }
+    };
+
+    let saveToLocalStorage = function (project) {
+        // Retrieve the current project count
+        let projectCount = parseInt(localStorage.getItem('projectCount')) || 0;
+
+        // Save the project using the next available key
+        localStorage.setItem(`project_${projectCount}`, JSON.stringify(project.toJSON()));
+
+        // Increment and update the project count
+        localStorage.setItem('projectCount', projectCount + 1);
+    };
+
+    let updateProjectInLocalStorage = function (project) {
+        let projectCount = parseInt(localStorage.getItem('projectCount')) || 0;
+
+        for (let i = 0; i < projectCount; i++) {
+            let savedProjectData = localStorage.getItem(`project_${i}`);
+
+            if (savedProjectData) {
+                let savedProject = Project.fromJSON(JSON.parse(savedProjectData));
+
+                // Match projects by name and update tasks
                 if (savedProject.getName() === project.getName()) {
-                    // Update the tasks and save back
-                    savedProject.tasks = project.getTasks(); // Update tasks
-                    localStorage.setItem(`project_${i}`, JSON.stringify(savedProject.toJSON()));
+                    localStorage.setItem(`project_${i}`, JSON.stringify(project.toJSON()));
                     break;
                 }
             }
         }
     };
 
+    let initialLoad = function () {
+        document.addEventListener("DOMContentLoaded", () => {
+            todoList.clearProjects(); // Clear in-memory projects
 
-    return {
-        init() {
-            document.addEventListener("DOMContentLoaded", () => { // Trigger when the page loads
-                todoList.clearProjects();
+            // Retrieve all projects from localStorage
+            let projectCount = parseInt(localStorage.getItem('projectCount')) || 0;
 
-                // Retrieve all projects from localStorage
-                let projectCount = parseInt(localStorage.getItem('projectCount')) || 0;
-
-                for (let i = 1; i <= projectCount; i++) {
-                    let projectData = localStorage.getItem(`project_${i}`);
-                    if (projectData) {
-                        let project = Project.fromJSON(JSON.parse(projectData));
-                        todoList.addProject(project);
-                    }
+            for (let i = 0; i < projectCount; i++) {
+                let projectData = localStorage.getItem(`project_${i}`);
+                if (projectData) {
+                    let project = Project.fromJSON(JSON.parse(projectData));
+                    todoList.addProject(project);
                 }
+            }
 
-                if (todoList.getProjects().length > 0) {
-                    currentProject = todoList.getProjects()[0];
-                } else {
-                    currentProject = new Project("Default");
-                    todoList.addProject(currentProject);
-                    localStorage.setItem('project_1', JSON.stringify(currentProject.toJSON()));
-                    localStorage.setItem('projectCount', 1);
-                }
+            // If no projects are found, create a default one
+            if (todoList.getProjects().length === 0) {
+                currentProject = new Project("Default");
+                todoList.addProject(currentProject);
 
-                // Display projects and tasks
-                
-                displayProjects();
-                displayTasks();
-            });
-        },
-        selectProject() {
-            document.body.addEventListener('click', (event) => {
-                if (event.target.classList.contains('project')) {
-                    console.log(event.target);
-                    event.target.classList.add('bg-purple-500')
-                    currentProject = todoList.findProject(event.target.innerHTML);
-                    console.log(`Current Project Name: ${currentProject.getName()}`)
-                }
-                clearBackgroundProjects();
-                displayTasks();
-            });
-        },
+                // Add tasks to the default project
+                currentProject.createTask("Morning Exercise", "Go for a 30-minute jog or do a yoga session.", "2025-01-21", "High");
+                currentProject.createTask("Breakfast Preparation", "Prepare and eat a healthy breakfast.", "2025-01-21", "Medium");
+                currentProject.createTask("Work Emails", "Check and respond to work-related emails.", "2025-01-21", "Medium");
+                currentProject.createTask("Lunch Break", "Take a break and have lunch.", "2025-01-21", "Low");
+                currentProject.createTask("Grocery Shopping", "Buy essential groceries for the week.", "2025-01-21", "High");
+                currentProject.createTask("Evening Walk", "Take a relaxing walk to clear your mind.", "2025-01-21", "Low");
+                currentProject.createTask("Plan for Tomorrow", "Write down tasks and goals for the next day.", "2025-01-21", "Medium");
 
-        editClicked() {
-            document.body.addEventListener('click', (event) => {
-                if (event.target.classList.contains('edit-button')) {
-                    console.log('Clicked on Edit Button');
-                    const taskElement = getDOMTask(event);
-                    const currentTask = currentProject.findTask(taskElement);
+                // Save the default project
+                localStorage.setItem('project_0', JSON.stringify(currentProject.toJSON()));
+                localStorage.setItem('projectCount', 1);
+            } else {
+                currentProject = todoList.getProjects()[0];
+            }
 
-                    openEditModal(currentTask);
-                    sumbitEditModal(currentTask);
-                    editCloseModal.addEventListener('click', closeEditModal);
-                }
-            });
-        },
-
-        detailsClicked() {
-            document.body.addEventListener('click', (event) => {
-                if (event.target.classList.contains('details-button')) {
-                    console.log('Clicked on Details Button');
-                    let currentTask = currentProject.findTask(getDOMTask(event));
-                    openDescriptionModal(currentTask);
-                    closeDescriptionModal();
-                }
-            });
-        },
-
-        deleteClicked() {
-            document.body.addEventListener('click', (event) => {
-                if (event.target.classList.contains('delete-button')) {
-                    console.log('Clicked on Delete Button');
-                    currentProject.deleteTask(getDOMTask(event));
-                    updateProjectInLocalStorage(currentProject);
-                    displayTasks();
-                }
-            });
-        },
-
-        createDOMProject() {
-            createProjectButton.addEventListener("click", function () {
-                openProjectModal();
-                closeProjectModal();
-                saveProjectModal();
-            });
-        },
-
-        createDOMTask() {
-            createTaskButton.addEventListener("click", openModal);
-            closeModalBtn.addEventListener("click", closeModal);
-            sumbitModal();
-        }
+            // Display all projects and tasks
+            displayProjects();
+            displayTasks();
+        });
     }
 
+    let selectProject = function () {
+        document.body.addEventListener('click', (event) => {
+            if (event.target.classList.contains('project')) {
+                console.log(event.target);
+                event.target.classList.add('bg-purple-500')
+                currentProject = todoList.findProject(event.target.innerHTML);
+                console.log(`Current Project Name: ${currentProject.getName()}`)
+            }
+            clearBackgroundProjects();
+            displayTasks();
+        });
+    }
+
+    let editClicked = function () {
+        document.body.addEventListener('click', (event) => {
+            if (event.target.classList.contains('edit-button')) {
+                console.log('Clicked on Edit Button');
+                const taskElement = getDOMTask(event);
+                const currentTask = currentProject.findTask(taskElement);
+
+                openEditModal(currentTask);
+                sumbitEditModal(currentTask);
+                editCloseModal.addEventListener('click', closeEditModal);
+            }
+        });
+    }
+
+    let detailsClicked = function () {
+        document.body.addEventListener('click', (event) => {
+            if (event.target.classList.contains('details-button')) {
+                console.log('Clicked on Details Button');
+                let currentTask = currentProject.findTask(getDOMTask(event));
+                openDescriptionModal(currentTask);
+                closeDescriptionModal();
+            }
+        });
+    }
+
+    let deleteClicked = function () {
+        document.body.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-button')) {
+                console.log('Clicked on Delete Button');
+                currentProject.deleteTask(getDOMTask(event));
+                updateProjectInLocalStorage(currentProject);
+                displayTasks();
+            }
+        });
+    }
+
+    let createDOMProject = function () {
+        createProjectButton.addEventListener("click", function () {
+            openProjectModal();
+            closeProjectModal();
+            saveProjectModal();
+        });
+    }
+
+    let createDOMTask = function () {
+        createTaskButton.addEventListener("click", openModal);
+        closeModalBtn.addEventListener("click", closeModal);
+        sumbitModal();
+    }
+
+    return {
+        app() {
+            initialLoad();
+            createDOMProject();
+            selectProject();
+            createDOMTask();
+            editClicked();
+            detailsClicked();
+            deleteClicked();
+        }
+    
+    }
 }();
 
+
 let UI = ScreenController;
-UI.init();
-UI.createDOMProject();
-UI.selectProject();
-UI.createDOMTask();
-UI.editClicked();
-UI.detailsClicked();
-UI.deleteClicked();
+UI.app();
