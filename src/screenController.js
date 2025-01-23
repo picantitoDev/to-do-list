@@ -110,23 +110,33 @@ export const ScreenController = function () {
 
     let displayTasks = function () {
         clearContent();
+
         for (let task of currentProject.getTasks()) {
             console.log(`TaskName: ${task.title} Status: ${task.done}`)
             let div = document.createElement('div');
-            div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8  ${chooseRightColor(task.priority)} task-container">
-                <div class="flex justify-evenly gap-2">
-                    <input type="checkbox" class="task-checkbox">
-                    <p class="task-title"> ${task.title}</p>
-                </div>
-                <div class="flex gap-4">
-                    <p>${task.dueDate}</p>
-                    <div class="task-button-container">
-                        <button class="bg-yellow-400 details-button">DETAILS</button>
-                        <button class="bg-yellow-400 edit-button">EDIT</button>
-                        <button class="bg-yellow-400 delete-button">DELETE</button>
-                    </div>
-                </div>
-            </div>`;
+                div.innerHTML = `<div class="bg-[#F8FAFC] flex items-center h-[70px] justify-between px-6 border-l-8 rounded-lg shadow-sm ${chooseRightColor(task.priority)} task-container transition duration-200 hover:shadow-lg">
+                        <!-- Tarea y Checkbox -->
+                        <div class="flex items-center gap-4">
+                            <input type="checkbox" class="task-checkbox w-5 h-5 accent-indigo-600 hover:accent-indigo-700">
+                            <p class="task-title font-medium text-gray-800">${task.title}</p>
+                        </div>
+                        
+                        <!-- Fecha y Botones -->
+                        <div class="flex items-center gap-6">
+                            <p class="text-sm text-gray-500 font-medium">${task.dueDate}</p>
+                            <div class="task-button-container flex gap-2">
+                                <button class="details-button bg-blue-500 text-white font-medium py-2 px-4 rounded-lg shadow hover:bg-blue-600 transition duration-200">
+                                    DETAILS
+                                </button>
+                                <button class="edit-button bg-green-500 text-white font-medium py-2 px-4 rounded-lg shadow hover:bg-green-600 transition duration-200">
+                                    EDIT
+                                </button>
+                                <button class="delete-button bg-red-500 text-white font-medium py-2 px-4 rounded-lg shadow hover:bg-red-600 transition duration-200">
+                                    DELETE
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
             content.appendChild(div);
 
             const editButton = div.querySelector('.edit-button');
@@ -147,11 +157,11 @@ export const ScreenController = function () {
             updateTaskVisualState(task, taskTitle, editButton, detailsButton);
             checkbox.addEventListener('change', () => {
                 handleCheckboxChange(task, checkbox, taskTitle, editButton, detailsButton);
-            });  
+            });
         }
     }
 
-    let updateTaskVisualState = function(task, taskTitle, editButton, detailsButton){
+    let updateTaskVisualState = function (task, taskTitle, editButton, detailsButton) {
         if (task.done) {
             taskTitle.style.textDecoration = 'line-through';
             editButton.disabled = true;
@@ -166,8 +176,8 @@ export const ScreenController = function () {
             detailsButton.classList.remove('disabled');
         }
     }
-    
-    let handleCheckboxChange = function(task, checkbox, taskTitle, editButton, detailsButton){
+
+    let handleCheckboxChange = function (task, checkbox, taskTitle, editButton, detailsButton) {
         task.done = checkbox.checked;
         updateTaskVisualState(task, taskTitle, editButton, detailsButton);
         updateProjectInLocalStorage(currentProject);
@@ -186,7 +196,9 @@ export const ScreenController = function () {
                 }
 
                 console.log(event.target);
-                event.target.classList.add('bg-purple-500');
+                event.target.classList.add("bg-blue-100");
+                event.target.classList.add("text-blue-600")
+                
                 currentProject = todoList.findProject(event.target.innerHTML);
                 console.log(`Current Project Name: ${currentProject.getName()}`);
                 clearBackgroundProjects();
@@ -263,7 +275,8 @@ export const ScreenController = function () {
     let clearBackgroundProjects = function () {
         Array.from(sidebar.children).forEach((child) => {
             if ((!child.id || child.id !== "create-project-btn") && child.innerHTML !== currentProject.getName()) {
-                child.classList.remove("bg-purple-500")
+                child.classList.remove("bg-blue-100");
+                child.classList.remove("text-blue-600")
             }
         });
     }
@@ -338,18 +351,26 @@ export const ScreenController = function () {
                     "flex",
                     "items-center",
                     "p-4",
-                    "text-xl",
-                    "h-[40px]",
+                    "text-lg",
+                    "h-[50px]",
                     "cursor-pointer",
-                    "text-purple-950",
-                    "font-semibold",
-                    "border-b-4",
-                    "border-b-purple-300"
+                    "text-gray-700",
+                    "font-medium",
+                    "rounded-md",
+                    "hover:bg-blue-100",
+                    "hover:text-blue-600",
+                    "transition",
+                    "duration-200",
+                    "border",
+                    "border-blue-200",
+                    "shadow-sm",
+                    "hover:shadow-md"
                 );
 
                 // Highlight the current project
                 if (savedProject.getName() === currentProject.getName()) {
-                    div.classList.add("bg-purple-500");
+                    div.classList.add("bg-blue-100");
+                    div.classList.add("text-blue-600")
                 }
 
                 // Append to sidebar
@@ -406,7 +427,7 @@ export const ScreenController = function () {
 
             // If no projects are found, create a default one
             if (todoList.getProjects().length === 0) {
-                currentProject = new Project("Default");
+                currentProject = new Project("ToDo");
                 todoList.addProject(currentProject);
 
                 // Add tasks to the default project
