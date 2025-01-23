@@ -472,8 +472,6 @@ export const ScreenController = function () {
                 currentProject.createTask("Lunch Break", "Take a break and have lunch.", "2025-01-21", "Low");
                 currentProject.createTask("Grocery Shopping", "Buy essential groceries for the week.", "2025-01-21", "High");
                 currentProject.createTask("Evening Walk", "Take a relaxing walk to clear your mind.", "2025-01-21", "Low");
-                currentProject.createTask("Plan for Tomorrow", "Write down tasks and goals for the next day.", "2025-01-21", "Medium");
-
                 // Save the default project
                 localStorage.setItem('project_0', JSON.stringify(currentProject.toJSON()));
                 localStorage.setItem('projectCount', 1);
