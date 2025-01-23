@@ -128,8 +128,11 @@ export const ScreenController = function () {
                 </div>
             </div>`;
             content.appendChild(div);
+
             const editButton = div.querySelector('.edit-button');
             const detailsButton = div.querySelector('.details-button');
+            const checkbox = div.querySelector('.task-checkbox');
+            const taskTitle = div.querySelector('.task-title');
 
             // Edit Button Listener
             editButton.addEventListener('click', () => {
@@ -140,41 +143,36 @@ export const ScreenController = function () {
                 editCloseModal.addEventListener('click', closeEditModal);
             });
 
-            const checkbox = div.querySelector('.task-checkbox');
             checkbox.checked = task.done;
-            const taskTitle = div.querySelector('.task-title');
-
-            if(task.done){
-                taskTitle.style.textDecoration = 'line-through';
-                editButton.disabled = true;
-                detailsButton.disabled = true;
-                editButton.classList.add('disabled');
-                detailsButton.classList.add('disabled');
-            }
-
-            console.log(`Task: ${task.title}, Done: ${task.done}, Checkbox checked: ${checkbox.checked}`);
-
-
+            updateTaskVisualState(task, taskTitle, editButton, detailsButton);
             checkbox.addEventListener('change', () => {
-                task.done = checkbox.checked;
-                if (checkbox.checked) {
-                    taskTitle.style.textDecoration = 'line-through';
-                    editButton.disabled = true;
-                    detailsButton.disabled = true;
-                    editButton.classList.add('disabled');
-                    detailsButton.classList.add('disabled');
-                } else {
-                    taskTitle.style.textDecoration = 'none';
-                    editButton.disabled = false;
-                    detailsButton.disabled = false;
-                    editButton.classList.remove('disabled');
-                    detailsButton.classList.remove('disabled');
-                }
-                console.log(`Checkbox changed for Task: ${task.title}, New Done state: ${task.done}`);
-                updateProjectInLocalStorage(currentProject);
+                handleCheckboxChange(task, checkbox, taskTitle, editButton, detailsButton);
             });  
         }
     }
+
+    let updateTaskVisualState = function(task, taskTitle, editButton, detailsButton){
+        if (task.done) {
+            taskTitle.style.textDecoration = 'line-through';
+            editButton.disabled = true;
+            detailsButton.disabled = true;
+            editButton.classList.add('disabled');
+            detailsButton.classList.add('disabled');
+        } else {
+            taskTitle.style.textDecoration = 'none';
+            editButton.disabled = false;
+            detailsButton.disabled = false;
+            editButton.classList.remove('disabled');
+            detailsButton.classList.remove('disabled');
+        }
+    }
+    
+    let handleCheckboxChange = function(task, checkbox, taskTitle, editButton, detailsButton){
+        task.done = checkbox.checked;
+        updateTaskVisualState(task, taskTitle, editButton, detailsButton);
+        updateProjectInLocalStorage(currentProject);
+    }
+
 
     let selectProject = function () {
         // Make sure the projects are rendered before attaching event listeners
