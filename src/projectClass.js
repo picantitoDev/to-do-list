@@ -77,7 +77,7 @@ export class Project {
                 description: task.description,
                 dueDate: task.dueDate,
                 priority: task.priority,
-                done: task.done,
+                done: task.done
             }))
         };
     }
@@ -88,7 +88,7 @@ export class Project {
         // Safely handle cases where tasks might be undefined or not an array
         if (Array.isArray(data.tasks)) {
             data.tasks.forEach(taskData => {
-                project.addTask(new Task(taskData.title, taskData.description, taskData.dueDate, taskData.priority));
+                project.addTask(new Task(taskData.title, taskData.description, taskData.dueDate, taskData.priority, taskData.done));
             });
         } else {
             console.warn("No tasks found in the project data or invalid tasks structure.");

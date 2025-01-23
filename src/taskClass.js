@@ -1,10 +1,20 @@
 export class Task {
-    constructor(title, description, dueDate, priority) {
+    constructor(title, description, dueDate, priority, done = false) {
         this._title = title;
         this._description = description;
         this._dueDate = dueDate;
         this._priority = priority;
-        this._done = false; 
+        this._done = done;
+    }
+
+    // Getter for done
+    get done() {
+        return this._done;
+    }
+
+    // Setter for done
+    set done(value) {
+        this._done = value;
     }
 
     // Getter for title

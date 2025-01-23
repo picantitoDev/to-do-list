@@ -111,6 +111,7 @@ export const ScreenController = function () {
     let displayTasks = function () {
         clearContent();
         for (let task of currentProject.getTasks()) {
+            console.log(`TaskName: ${task.title} Status: ${task.done}`)
             let div = document.createElement('div');
             div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8  ${chooseRightColor(task.priority)} task-container">
                 <div class="flex justify-evenly gap-2">
@@ -128,8 +129,6 @@ export const ScreenController = function () {
             </div>`;
             content.appendChild(div);
             const editButton = div.querySelector('.edit-button');
-            const checkbox = div.querySelector('.task-checkbox');
-            checkbox.checked = task.done;
             // Edit Button Listener
             editButton.addEventListener('click', () => {
                 console.log('Clicked on Edit Button');
@@ -139,15 +138,17 @@ export const ScreenController = function () {
                 editCloseModal.addEventListener('click', closeEditModal);
             });
 
-            // Checkbox Change Listener: Update the 'done' state of the task
-            checkbox.addEventListener('change', () => {
-                // Find the task and update its 'done' state
-                const updatedTask = currentProject.findTask(task.title);
-                updatedTask.done = checkbox.checked;
+            const checkbox = div.querySelector('.task-checkbox');
+            checkbox.checked = task.done;
 
-                // Optionally, save the updated state back to localStorage if required
+            console.log(`Task: ${task.title}, Done: ${task.done}, Checkbox checked: ${checkbox.checked}`);
+
+
+            checkbox.addEventListener('change', () => {
+                task.done = checkbox.checked;
+                console.log(`Checkbox changed for Task: ${task.title}, New Done state: ${task.done}`);
                 updateProjectInLocalStorage(currentProject);
-            });
+            });  
         }
     }
 
