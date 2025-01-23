@@ -7,23 +7,34 @@
     <title>To Do List</title>
 <script defer src="bundle.js"></script></head>
 
-<body class="flex h-svh w-svw justify-center items-center bg-[#faf5ff] p-40">
-    <div class="h-[40rem] w-[80rem] grid sm:grid-cols-12">
-        <!-- Header -->
-        <div class="bg-[#7e22ce] h-[4rem] col-span-12  text-white font-bold flex items-center pl-4 text-4xl"
-            id="header">ToDo List</div>
-
-        <!-- Sidebar -->
-        <div class="bg-[#e1daff] h-[36rem] col-span-3 overflow-y-auto" id="sidebar">
-            <button id="create-project-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create
-                Project</button>
+<body class="flex h-svh w-svw justify-center items-center bg-[#FFFF] p-40">
+    <div class="container w-[80rem] flex justify-center items-center shadow-[0px_4px_20px_rgba(0,0,0,0.3)] rounded-lg">
+        <div class="w-[80rem] grid sm:grid-cols-12 bg-white rounded-lg">
+            <!-- Header -->
+            <div class="bg-[#59add4] h-[4rem] col-span-12 text-white font-bold flex items-center pl-4 text-4xl rounded-t-lg"
+                id="header">ToDo List</div>
+        
+            <!-- Buttons Container -->
+            <div class="col-span-12 flex justify-betweenitems-center mt-2 px-2 space-x-4">
+                <button id="create-project-btn" 
+                    class="bg-[#78C0E1]  text-white w-[25%] rounded-lg py-2 px-4 font-medium hover:bg-[#61A9C8] transition duration-200">
+                    Create Project
+                </button>
+                <button id="create-task-btn" 
+                    class="bg-[#78C0E1] text-white w-[75%] rounded-lg py-2 px-4 font-medium hover:bg-[#61A9C8] transition duration-200">
+                    Create Task
+                </button>
+            </div>
+        
+            <!-- Sidebar -->
+            <div class="bg-[#F8FAFC] scrollbar-custom h-[36rem] col-span-3 overflow-y-auto mt-4 space-y-2 rounded-bl-lg p-4 shadow-inner" id="sidebar">
+            </div>
+            
+            <!-- Content -->
+            <div class="bg-[#ffffff] scrollbar-custom col-span-9 h-[36rem] overflow-y-auto flex flex-col gap-3 p-4 mt-4 rounded-br-lg shadow-inner"
+                id="content">
+            </div>
         </div>
-
-        <!-- Content -->
-        <div class="bg-white col-span-9 h-[36rem] overflow-y-auto flex flex-col gap-4 p-0" id="content">
-            <button id="create-task-btn" class="bg-[#4A90E2] text-white rounded-xl p-2 w-[90%] mt-4">Create
-                Task</button>
-        </div>  
     </div>
 
     <!-- Modal -->
@@ -43,7 +54,7 @@
                     <option value="Medium">Medium</option>
                     <option value="Low">Low</option>
                 </select>
-                <button type="sumbit" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 w-full">
+                <button type="sumbit" class="bg-[#59add4] text-white px-4 py-2 rounded hover:bg-[#61A9C8] w-full">
                     Add Task
                 </button>
             </form>
@@ -68,7 +79,7 @@
                     <option value="Medium">Medium</option>
                     <option value="Low">Low</option>
                 </select>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">
+                <button type="submit" class="bg-[#59add4] text-white px-4 py-2 rounded hover:bg-[#61A9C8] w-full">
                     Save Task
                 </button>
             </form>
@@ -98,5 +109,4 @@
     </div>
     
 </body>
-
 </html>
