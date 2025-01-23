@@ -1,5 +1,6 @@
 import { TodoController } from "./todoController";
 import { Project } from "./projectClass";
+import { format } from 'date-fns';
 
 export const ScreenController = function () {
 
@@ -108,13 +109,34 @@ export const ScreenController = function () {
         });
     }
 
+    function getDaySuffix(date) {
+        const day = date.getDate();
+        if (day >= 11 && day <= 13) return 'th';
+        switch (day % 10) {
+            case 1: return 'st';
+            case 2: return 'nd';
+            case 3: return 'rd';
+            default: return 'th';
+        }
+    }
+
+    function formatTaskDate(dateStr) {
+        const [year, month, day] = dateStr.split('-');
+        const date = new Date(year, month - 1, day);
+
+        const formattedDate = format(date, 'MMM dd');
+        const daySuffix = getDaySuffix(date);
+        return formattedDate.replace(/\d+/, match => `${match}${daySuffix}, ${year}`);
+    }
+
     let displayTasks = function () {
         clearContent();
 
         for (let task of currentProject.getTasks()) {
-            console.log(`TaskName: ${task.title} Status: ${task.done}`)
+            const formattedTaskDate = formatTaskDate(task.dueDate);
+
             let div = document.createElement('div');
-                div.innerHTML = `<div class="bg-[#F8FAFC] flex items-center h-[70px] justify-between px-6 border-l-8 rounded-lg shadow-sm ${chooseRightColor(task.priority)} task-container transition duration-200 hover:shadow-lg">
+            div.innerHTML = `<div class="bg-[#F8FAFC] flex items-center h-[70px] justify-between px-6 border-l-8 rounded-lg shadow-sm ${chooseRightColor(task.priority)} task-container transition duration-200 hover:shadow-lg">
                         <!-- Tarea y Checkbox -->
                         <div class="flex items-center gap-4">
                             <input type="checkbox" class="task-checkbox w-5 h-5 accent-indigo-600 hover:accent-indigo-700">
@@ -123,7 +145,7 @@ export const ScreenController = function () {
                         
                         <!-- Fecha y Botones -->
                         <div class="flex items-center gap-6">
-                            <p class="text-sm text-gray-500 font-medium">${task.dueDate}</p>
+                            <p class="text-sm text-gray-500 font-medium taskDate">${formattedTaskDate}</p>
                             <div class="task-button-container flex gap-2">
                                 <button class="details-button bg-blue-500 text-white font-medium py-2 px-4 rounded-lg shadow hover:bg-blue-600 transition duration-200">
                                     DETAILS
@@ -143,6 +165,7 @@ export const ScreenController = function () {
             const detailsButton = div.querySelector('.details-button');
             const checkbox = div.querySelector('.task-checkbox');
             const taskTitle = div.querySelector('.task-title');
+            const taskDate = div.querySelector('.taskDate')
 
             // Edit Button Listener
             editButton.addEventListener('click', () => {
@@ -154,32 +177,36 @@ export const ScreenController = function () {
             });
 
             checkbox.checked = task.done;
-            updateTaskVisualState(task, taskTitle, editButton, detailsButton);
+            updateTaskVisualState(task, taskTitle, taskDate, editButton, detailsButton);
             checkbox.addEventListener('change', () => {
-                handleCheckboxChange(task, checkbox, taskTitle, editButton, detailsButton);
+                handleCheckboxChange(task, checkbox, taskTitle, taskDate, editButton, detailsButton);
             });
         }
     }
 
-    let updateTaskVisualState = function (task, taskTitle, editButton, detailsButton) {
+    let updateTaskVisualState = function (task, taskTitle, taskDate, editButton, detailsButton) {
         if (task.done) {
             taskTitle.style.textDecoration = 'line-through';
             editButton.disabled = true;
             detailsButton.disabled = true;
-            editButton.classList.add('disabled');
-            detailsButton.classList.add('disabled');
+            taskTitle.classList.add('opacity-50');
+            taskDate.classList.add('opacity-50');
+            editButton.classList.add('disabled', 'opacity-50');
+            detailsButton.classList.add('disabled', 'opacity-50');
         } else {
             taskTitle.style.textDecoration = 'none';
             editButton.disabled = false;
             detailsButton.disabled = false;
-            editButton.classList.remove('disabled');
-            detailsButton.classList.remove('disabled');
+            taskTitle.classList.remove('opacity-50');
+            taskDate.classList.remove('opacity-50');
+            editButton.classList.remove('disabled', 'opacity-50');
+            detailsButton.classList.remove('disabled', 'opacity-50');
         }
     }
 
-    let handleCheckboxChange = function (task, checkbox, taskTitle, editButton, detailsButton) {
+    let handleCheckboxChange = function (task, checkbox, taskTitle, taskDate, editButton, detailsButton) {
         task.done = checkbox.checked;
-        updateTaskVisualState(task, taskTitle, editButton, detailsButton);
+        updateTaskVisualState(task, taskTitle, taskDate, editButton, detailsButton);
         updateProjectInLocalStorage(currentProject);
     }
 
@@ -198,7 +225,7 @@ export const ScreenController = function () {
                 console.log(event.target);
                 event.target.classList.add("bg-blue-100");
                 event.target.classList.add("text-blue-600")
-                
+
                 currentProject = todoList.findProject(event.target.innerHTML);
                 console.log(`Current Project Name: ${currentProject.getName()}`);
                 clearBackgroundProjects();
@@ -316,6 +343,14 @@ export const ScreenController = function () {
         projectForm.onsubmit = (e) => {
             e.preventDefault();
 
+            const projectName = document.querySelector("#project-name").value;
+            const existingProject = todoList.getProjects().find(project => project.getName() === projectName);
+
+            if (existingProject) {
+                alert('¡This project already exists!');
+                return;
+            }
+
             // Update task with new values
             let newProject = new Project(document.querySelector("#project-name").value);
             todoList.addProject(newProject);
@@ -427,7 +462,7 @@ export const ScreenController = function () {
 
             // If no projects are found, create a default one
             if (todoList.getProjects().length === 0) {
-                currentProject = new Project("ToDo");
+                currentProject = new Project("To-Do");
                 todoList.addProject(currentProject);
 
                 // Add tasks to the default project
