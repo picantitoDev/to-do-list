@@ -112,21 +112,115 @@ export const ScreenController = function () {
         clearContent();
         for (let task of currentProject.getTasks()) {
             let div = document.createElement('div');
-            div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8 border-l-green-500 task-container">
+
+
+            div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8  ${chooseRightColor(task.priority)} task-container">
                 <div class="flex justify-evenly gap-2">
                     <input type="checkbox">
                     <p class="task-title"> ${task.title}</p>
                 </div>
                 <div class="flex gap-4">
                     <p>${task.dueDate}</p>
-                    <button class="bg-yellow-400 details-button">DETAILS</button>
-                    <button class="bg-yellow-400 edit-button">EDIT</button>
-                    <button class="bg-yellow-400 delete-button">DELETE</button>
+                    <div class="task-button-container">
+                        <button class="bg-yellow-400 details-button">DETAILS</button>
+                        <button class="bg-yellow-400 edit-button">EDIT</button>
+                        <button class="bg-yellow-400 delete-button">DELETE</button>
+                    </div>
                 </div>
             </div>`;
             content.appendChild(div);
+            const editButton = div.querySelector('.edit-button');
+
+            // Edit Button Listener
+            editButton.addEventListener('click', () => {
+                console.log('Clicked on Edit Button');
+                const currentTask = currentProject.findTask(task.title);
+                openEditModal(currentTask);
+                sumbitEditModal(currentTask);
+                editCloseModal.addEventListener('click', closeEditModal);
+            });
         }
     }
+
+    let selectProject = function () {
+        // Make sure the projects are rendered before attaching event listeners
+        const projectElements = document.querySelectorAll('.project');
+    
+        projectElements.forEach(projectElement => {
+            projectElement.addEventListener('click', (event) => {
+                // Avoid the checkbox elements
+                if (event.target.tagName === "INPUT" && event.target.type === "checkbox") {
+                    return;
+                }
+    
+                console.log(event.target);
+                event.target.classList.add('bg-purple-500');
+                currentProject = todoList.findProject(event.target.innerHTML);
+                console.log(`Current Project Name: ${currentProject.getName()}`);
+                clearBackgroundProjects();
+                displayTasks();
+            });
+        });
+    }
+
+    let editClicked = function () {
+        const editButtons = document.querySelectorAll('.edit-button');
+
+        editButtons.forEach(editButton => {
+            editButton.addEventListener('click', (event) => {
+                console.log('Clicked on Edit Button');
+                const taskElement = getDOMTask(event);
+                const currentTask = currentProject.findTask(taskElement);
+
+                openEditModal(currentTask);
+                sumbitEditModal(currentTask);
+                editCloseModal.addEventListener('click', closeEditModal);
+            });
+        });
+    }
+
+    let detailsClicked = function () {
+        document.body.addEventListener('click', (event) => {
+            if (event.target.tagName === "INPUT" && event.target.type === "checkbox") {
+                return;
+            }
+
+            if (event.target.classList.contains('details-button')) {
+                console.log('Clicked on Details Button');
+                let currentTask = currentProject.findTask(getDOMTask(event));
+                openDescriptionModal(currentTask);
+                closeDescriptionModal();
+            }
+        });
+    }
+
+    let deleteClicked = function () {
+        document.body.addEventListener('click', (event) => {
+            if (event.target.tagName === "INPUT" && event.target.type === "checkbox") {
+                return;
+            }
+
+            if (event.target.classList.contains('delete-button')) {
+                console.log('Clicked on Delete Button');
+                currentProject.deleteTask(getDOMTask(event));
+                updateProjectInLocalStorage(currentProject);
+                displayTasks();
+            }
+        });
+    }
+
+    let chooseRightColor = function (taskPriority) {
+        switch (taskPriority) {
+            case "High":
+                return "border-l-red-500";
+            case "Medium":
+                return "border-l-yellow-500";
+            case "Low":
+                return "border-l-green-500";
+            default:
+                return "border-l-gray-300";
+        }
+    };
 
     let getDOMTask = function (event) {
         const taskElement = event.target.closest(".task-container");
@@ -230,6 +324,8 @@ export const ScreenController = function () {
                 sidebar.appendChild(div);
             }
         }
+
+        selectProject();
     };
 
     let saveToLocalStorage = function (project) {
@@ -303,55 +399,6 @@ export const ScreenController = function () {
         });
     }
 
-    let selectProject = function () {
-        document.body.addEventListener('click', (event) => {
-            if (event.target.classList.contains('project')) {
-                console.log(event.target);
-                event.target.classList.add('bg-purple-500')
-                currentProject = todoList.findProject(event.target.innerHTML);
-                console.log(`Current Project Name: ${currentProject.getName()}`)
-            }
-            clearBackgroundProjects();
-            displayTasks();
-        });
-    }
-
-    let editClicked = function () {
-        document.body.addEventListener('click', (event) => {
-            if (event.target.classList.contains('edit-button')) {
-                console.log('Clicked on Edit Button');
-                const taskElement = getDOMTask(event);
-                const currentTask = currentProject.findTask(taskElement);
-
-                openEditModal(currentTask);
-                sumbitEditModal(currentTask);
-                editCloseModal.addEventListener('click', closeEditModal);
-            }
-        });
-    }
-
-    let detailsClicked = function () {
-        document.body.addEventListener('click', (event) => {
-            if (event.target.classList.contains('details-button')) {
-                console.log('Clicked on Details Button');
-                let currentTask = currentProject.findTask(getDOMTask(event));
-                openDescriptionModal(currentTask);
-                closeDescriptionModal();
-            }
-        });
-    }
-
-    let deleteClicked = function () {
-        document.body.addEventListener('click', (event) => {
-            if (event.target.classList.contains('delete-button')) {
-                console.log('Clicked on Delete Button');
-                currentProject.deleteTask(getDOMTask(event));
-                updateProjectInLocalStorage(currentProject);
-                displayTasks();
-            }
-        });
-    }
-
     let createDOMProject = function () {
         createProjectButton.addEventListener("click", function () {
             openProjectModal();
@@ -376,6 +423,6 @@ export const ScreenController = function () {
             detailsClicked();
             deleteClicked();
         }
-    
+
     }
 }();
