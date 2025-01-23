@@ -4,6 +4,7 @@ export class Task {
         this._description = description;
         this._dueDate = dueDate;
         this._priority = priority;
+        this._done = false; 
     }
 
     // Getter for title

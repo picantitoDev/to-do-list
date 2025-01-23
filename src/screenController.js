@@ -112,11 +112,9 @@ export const ScreenController = function () {
         clearContent();
         for (let task of currentProject.getTasks()) {
             let div = document.createElement('div');
-
-
             div.innerHTML = `<div class="bg-gray-200 flex items-center h-[40px] justify-between px-4 border-l-8  ${chooseRightColor(task.priority)} task-container">
                 <div class="flex justify-evenly gap-2">
-                    <input type="checkbox">
+                    <input type="checkbox" class="task-checkbox">
                     <p class="task-title"> ${task.title}</p>
                 </div>
                 <div class="flex gap-4">
@@ -130,7 +128,8 @@ export const ScreenController = function () {
             </div>`;
             content.appendChild(div);
             const editButton = div.querySelector('.edit-button');
-
+            const checkbox = div.querySelector('.task-checkbox');
+            checkbox.checked = task.done;
             // Edit Button Listener
             editButton.addEventListener('click', () => {
                 console.log('Clicked on Edit Button');
@@ -139,20 +138,30 @@ export const ScreenController = function () {
                 sumbitEditModal(currentTask);
                 editCloseModal.addEventListener('click', closeEditModal);
             });
+
+            // Checkbox Change Listener: Update the 'done' state of the task
+            checkbox.addEventListener('change', () => {
+                // Find the task and update its 'done' state
+                const updatedTask = currentProject.findTask(task.title);
+                updatedTask.done = checkbox.checked;
+
+                // Optionally, save the updated state back to localStorage if required
+                updateProjectInLocalStorage(currentProject);
+            });
         }
     }
 
     let selectProject = function () {
         // Make sure the projects are rendered before attaching event listeners
         const projectElements = document.querySelectorAll('.project');
-    
+
         projectElements.forEach(projectElement => {
             projectElement.addEventListener('click', (event) => {
                 // Avoid the checkbox elements
                 if (event.target.tagName === "INPUT" && event.target.type === "checkbox") {
                     return;
                 }
-    
+
                 console.log(event.target);
                 event.target.classList.add('bg-purple-500');
                 currentProject = todoList.findProject(event.target.innerHTML);

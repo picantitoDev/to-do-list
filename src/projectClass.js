@@ -76,7 +76,8 @@ export class Project {
                 title: task.title,
                 description: task.description,
                 dueDate: task.dueDate,
-                priority: task.priority
+                priority: task.priority,
+                done: task.done,
             }))
         };
     }
