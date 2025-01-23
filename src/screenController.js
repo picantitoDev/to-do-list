@@ -129,6 +129,8 @@ export const ScreenController = function () {
             </div>`;
             content.appendChild(div);
             const editButton = div.querySelector('.edit-button');
+            const detailsButton = div.querySelector('.details-button');
+
             // Edit Button Listener
             editButton.addEventListener('click', () => {
                 console.log('Clicked on Edit Button');
@@ -140,12 +142,34 @@ export const ScreenController = function () {
 
             const checkbox = div.querySelector('.task-checkbox');
             checkbox.checked = task.done;
+            const taskTitle = div.querySelector('.task-title');
+
+            if(task.done){
+                taskTitle.style.textDecoration = 'line-through';
+                editButton.disabled = true;
+                detailsButton.disabled = true;
+                editButton.classList.add('disabled');
+                detailsButton.classList.add('disabled');
+            }
 
             console.log(`Task: ${task.title}, Done: ${task.done}, Checkbox checked: ${checkbox.checked}`);
 
 
             checkbox.addEventListener('change', () => {
                 task.done = checkbox.checked;
+                if (checkbox.checked) {
+                    taskTitle.style.textDecoration = 'line-through';
+                    editButton.disabled = true;
+                    detailsButton.disabled = true;
+                    editButton.classList.add('disabled');
+                    detailsButton.classList.add('disabled');
+                } else {
+                    taskTitle.style.textDecoration = 'none';
+                    editButton.disabled = false;
+                    detailsButton.disabled = false;
+                    editButton.classList.remove('disabled');
+                    detailsButton.classList.remove('disabled');
+                }
                 console.log(`Checkbox changed for Task: ${task.title}, New Done state: ${task.done}`);
                 updateProjectInLocalStorage(currentProject);
             });  
